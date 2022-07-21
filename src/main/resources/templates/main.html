@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <style>table { border-collapse: collapse;}  </style>
+  <title>달력 만들기</title>
+  <script type="text/javascript" th:inline="javascript" >
+    var today = new Date();//오늘 날짜
+
+    function prevClaendar(){//이전 달력
+      today = new Date(today.getFullYear(), today.getMonth()-1,today.getDate());
+      buildCalendar();
+    }
+    //다음 달력을 오늘을 저장하고 달력에 뿌려줌
+    function nextCalendar(){
+      today = new Date(today.getFullYear(), today.getMonth()+1,today.getDate());
+      buildCalendar();
+
+    }
+    function buildCalendar(){
+      var nMonth = new Date(today.getFullYear(),today.getMonth(),1);// 이번달의 첫번째날
+      var lastDate =new Date(today.getFullYear(),today.getMonth()+1,0);//이번달의 마지막날
+      var tblCalendar =document.getElementById("calendar");    //테이블 달력을 만드는 테이블
+      var tblCalendarYM =document.getElementById("calendarYM"); ///XXXX년도XX월 출력
+      tblCalendarYM.innerHTML = today.getFullYear()+"년"+(today.getMonth()+1)+"월";
+
+      //기존에 테이블에 잇던 달력 내용 삭제
+      while(tblCalendar.rows.length>2){
+        tblCalendar.deleteRow(tblCalendar.rows.length -1);
+      }
+      var row = null;
+      row =tblCalendar.insertRow();
+      var cnt =0;
+      // 1일이 시작되는 칸을 맞추어줌
+
+      for ( i=0; i <nMonth.getDay(); i++) {
+        cell =row.insertCell();
+        cnt = cnt + 1;
+      }
+
+      var data = [[${user}]];
+
+      console.log(data);
+      //달력 출력
+      for(i=1; i<=lastDate.getDate(); i++){
+        cell =row.insertCell();
+        cell.innerHTML = i;
+        data.schedulerDtos.forEach((s) => {
+          s.schedules.forEach((t)=>{
+            if(t.month==(today.getMonth()+1) && t.day==i){
+              cell.innerHTML += "<br>";
+              cell.innerHTML += "<a href='#' style='text-align: right' >"+t.title+"-"+t.hour+ "시"+t.minute+"분</a>";
+            }
+          })
+        })
+        cnt = cnt + 1;
+        if (cnt%7 == 0)    //1주=7일
+          row = calendar.insertRow();
+
+      }
+    }
+
+  </script>
+</head>
+<body>
+<div th:width="800" th:height="100" th:align="center">
+  <h2 align="left" th:text="|${user.userId + '의 일정표'}|"></h2>
+  <span th:align="right" ><h1 th:each="scheduler : ${user.schedulerDtos}" th:text="${scheduler.title}"></h1></span>
+</div>
+
+<table id="calendar"  border="3" align="center" width="1000" height="700"  >
+  <tr >
+    <td align ="center"> <label onclick="prevClaendar()"><</label> </td>
+    <td colspan="5" align ="center" id="calendarYM">yyyy년 m월</td>
+    <td align ="center"> <label onclick="nextCalendar()">></label> </td>
+  </tr>
+
+  <tr>
+    <td align="center">일</td>
+    <td align="center">월</td>
+    <td align="center">화</td>
+    <td align="center">수</td>
+    <td align="center">목</td>
+    <td align="center">금</td>
+    <td align="center">토</td>
+  </tr>
+
+</table>
+
+<!--js에서 만든   buildCalendar(); 함수를 테이불 밑에 붙이면 완성된다
+테이블 전체 테두리가 안되는것과 마지막일 다은 공란이 안생기는 점이 보안
+해야한다-->
+<!-- <script type="text/javascript">
+  buildCalendar();
+</script>
+컨트롤 하는것을 모르겠다 -->
+
+<script type="text/javascript" >
+
+  buildCalendar();
+</script>
+
+
+</body>
+</html>
