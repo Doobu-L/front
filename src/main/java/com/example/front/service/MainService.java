@@ -14,7 +14,5 @@ public class MainService {
   public UserDto getUser(){
     return apiService.getUser();
   }
-  /*
-  * test용커밋
-  * */
+
 }
