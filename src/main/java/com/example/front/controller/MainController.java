@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/main")
@@ -29,10 +30,17 @@ public class MainController {
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
 
-    modelMap.addAttribute("user",user);
+    modelMap.addAttribute("userId",user.getUserId());
     modelMap.addAttribute("schedulers",schedulerDtos);
     modelMap.addAttribute("schedules",scheduleDtos);
     return "main.html";
+  }
+
+  @GetMapping("/schedules")
+  public String getSchedules(ModelMap model, @RequestParam List<Long> ids) {
+    List<ScheduleDto> scheduleDtos = mainService.getSchedulesBySchedulerIds(ids);
+    model.addAttribute("schedules",scheduleDtos);
+    return "main :: #table";
   }
 
 }
